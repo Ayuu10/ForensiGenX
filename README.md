@@ -26,9 +26,9 @@ This repository currently implements **Stage 1 & 2** of the above pipeline, proc
 
 ### What Has Been Built
 
-1. **Dataset Subsetting (`download_sample.py`)**
-   - Automatically subsets the Visual Genome `region_descriptions.json` array.
-   - Outputs robust mock test cases into `sample_sentences.json` so the team can align on a unified testing format.
+1. **Dataset Download (`download_dataset.py`)**
+   - Automatically downloads the full Visual Genome `region_descriptions.json.zip` dataset.
+   - Outputs the extracted dataset to use in actual NLP processing.
 
 2. **Core Extraction Engine (`process_visual_genome.py`)** 
    - **Text Cleanser**: Mapped regex sanitization cleaning out stray punctuation, invalid characters, and malformed spacing. Generates UUID references and writes the unified output to `cleaned_text.txt`.
@@ -46,9 +46,9 @@ pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
-Initialize the sample dataset parameters:
+Initialize the actual dataset:
 ```bash
-python download_sample.py
+python download_dataset.py
 ```
 
 Run the NLP Extractor:
@@ -57,6 +57,6 @@ python process_visual_genome.py
 ```
 
 ### Outputs Generated
-- `dataset/region_descriptions.json`: Mock dataset JSON payload.
+- `dataset/region_descriptions.json`: The full Visual Genome region descriptions dataset.
 - `cleaned_text.txt`: The isolated sentence phrases cleaned and mapped by their unique sentence ID.
 - `linguistic_features.json`: The fully realized structured output array defining distinct objects, attributes, and inter-object relationships formatted for the layout engine.

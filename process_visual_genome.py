@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import re
@@ -33,12 +34,9 @@ def clean_text(text):
     text = re.sub(r'\s+', ' ', text)
     return text.strip().lower()
 
-def extract_features(text):
-    doc = nlp(text)
-    
+def extract_features_from_doc(doc, original_clean_text):
     objects = set()
     attributes = {}
-    relations = []
     
     # 1. Extract Objects using noun chunks
     for chunk in doc.noun_chunks:
@@ -59,8 +57,7 @@ def extract_features(text):
     
     # 3. Extract Relations
     relations = []
-    
-    text_lower = text.lower()
+    text_lower = original_clean_text
     
     # Sort objects by their position in text to easily find adjacent ones
     obj_spans = []
@@ -91,35 +88,45 @@ def extract_features(text):
     }
 
 def main():
+    parser = argparse.ArgumentParser(description="Process Visual Genome Dataset")
+    parser.add_argument("--limit", type=int, default=1000, 
+                        help="Limit the number of images to process (default: 1000). Set to 0 to process all.")
+    args = parser.parse_args()
+
     dataset_path = "dataset/region_descriptions.json"
     
     if not os.path.exists(dataset_path):
-        print(f"Error: {dataset_path} not found. Please run download_sample.py first.")
+        print(f"Error: {dataset_path} not found. Please run download_dataset.py first.")
         return
 
-    print("Loading dataset...")
+    print("Loading dataset into memory...")
     with open(dataset_path, "r", encoding="utf-8") as f:
         data = json.load(f)
+
+    print(f"Loaded {len(data)} images.")
+    if args.limit > 0:
+        print(f"Applying limit: Processing only the first {args.limit} images.")
+        data = data[:args.limit]
+    else:
+        print("Processing all images (this might take a while).")
 
     print("Extracting subset and cleaning text...")
     
     sample_sentences = []
     cleaned_texts = []
-    linguistic_features = []
+    metadata = []
     
     sentence_id = 1
     
-    # Process regions
-    for image_data in tqdm(data, desc="Processing Images"):
+    # First pass: collect all phrases for batch SpaCy processing
+    for image_data in tqdm(data, desc="Preparing Texts"):
         for region in image_data.get("regions", []):
             phrase = region.get("phrase", "")
             if not phrase:
                 continue
                 
-            # Clean text
             clean_phrase = clean_text(phrase)
             
-            # Subsetting for team
             sample_sentence = {
                 "id": sentence_id,
                 "original_text": phrase,
@@ -129,15 +136,23 @@ def main():
             }
             sample_sentences.append(sample_sentence)
             cleaned_texts.append(f"{sentence_id}: {clean_phrase}")
-            
-            # Linguistic Analysis
-            features = extract_features(clean_phrase)
-            features["id"] = sentence_id
-            features["sentence"] = clean_phrase
-            
-            linguistic_features.append(features)
+            metadata.append(clean_phrase)
             
             sentence_id += 1
+
+    print(f"Collected {len(metadata)} phrases. Running NLP Pipeline...")
+    
+    linguistic_features = []
+    # Process texts in batches using nlp.pipe
+    batch_size = 2000
+    docs = nlp.pipe(metadata, batch_size=batch_size)
+    
+    for i, doc in enumerate(tqdm(docs, total=len(metadata), desc="NLP Processing")):
+        clean_phrase = metadata[i]
+        features = extract_features_from_doc(doc, clean_phrase)
+        features["id"] = i + 1
+        features["sentence"] = clean_phrase
+        linguistic_features.append(features)
 
     # Save Outputs
     print("Saving outputs...")

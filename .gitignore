@@ -1,0 +1,7 @@
+# Dataset and generated files
+dataset/
+linguistic_features.json
+sample_sentences.json
+cleaned_text.txt
+__pycache__/
+*.pkl
