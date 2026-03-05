@@ -1,0 +1,17 @@
+{
+  "objects": [
+    { "id": "o1", "name": "officer" },
+    { "id": "o2", "name": "suspect" },
+    { "id": "o3", "name": "blue_car" },
+    { "id": "o4", "name": "flashlight" },
+    { "id": "o5", "name": "gun" },
+    { "id": "o6", "name": "street_light" }
+  ],
+  "relationships": [
+    { "subject": "o1", "predicate": "near", "object": "o2" },
+    { "subject": "o2", "predicate": "near", "object": "o3" },
+    { "subject": "o4", "predicate": "near", "object": "o1" },
+    { "subject": "o5", "predicate": "near", "object": "o3" },
+    { "subject": "o6", "predicate": "above", "object": "o3" }
+  ]
+}
