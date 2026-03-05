@@ -1,7 +1,18 @@
-# Dataset and generated files
+# Dataset
 dataset/
+
+# Generated outputs
 linguistic_features.json
-sample_sentences.json
 cleaned_text.txt
+scene_graph.json
+
+# Python cache
 __pycache__/
+*.pyc
+
+# Serialized files
 *.pkl
+
+# Virtual environment
+.venv/
+.env
