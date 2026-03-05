@@ -1,0 +1,17 @@
+{
+  "objects": [
+    { "id": "o1", "name": "man" },
+    { "id": "o2", "name": "table" },
+    { "id": "o3", "name": "knife" },
+    { "id": "o4", "name": "chair" },
+    { "id": "o5", "name": "backpack" },
+    { "id": "o6", "name": "street_lamp" }
+  ],
+  "relationships": [
+    { "subject": "o1", "predicate": "near", "object": "o2" },
+    { "subject": "o3", "predicate": "on", "object": "o2" },
+    { "subject": "o4", "predicate": "left_of", "object": "o2" },
+    { "subject": "o5", "predicate": "under", "object": "o4" },
+    { "subject": "o6", "predicate": "above", "object": "o2" }
+  ]
+}
